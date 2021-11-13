@@ -1,14 +1,18 @@
 <template>
   <div id="app">
     <router-view/>
+    <notifications group="foo" position="bottom right"/>
   </div>
 </template>
 
 <style lang="scss">
 @import "~@/assets/scss/vendors/bootstrap-vue/index";
+@import "assets/scss/_shared.scss";
 
 body{
   margin: 0px;
+  background: $primary-color;
+  
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

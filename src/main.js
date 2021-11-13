@@ -5,8 +5,13 @@ import './plugins/bootstrap-vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+// import axios from 'axios'
+import Notifications from 'vue-notification'
+
+Vue.use(Notifications)
 
 Vue.config.productionTip = false
+//axios.defaults.baseURL="https://script.google.com/macros/s/AKfycbx_7Y4LN95exHiq7mgPgKhzzes5EhbyUVST7INH7DCC9JTKMyH3EwHikTYMjh31vQuP5w"
 
 new Vue({
   router,

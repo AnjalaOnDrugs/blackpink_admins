@@ -1,40 +1,36 @@
 <template>
-  <div class="main">
-    <div class="bp-image">
-      <img class="desktop" src="../assets/bp.jpg" alt="" />
-      <img class="mobile" src="../assets/mobile-bp.jpg" alt="" />
-    </div>
-    <div class="side-section">
-      <h2>BPSL MAINTAINCE SIGN UP</h2>
-      <div class="profiles">
-        <div class="profile">
-          <div class="image">
-            <img src="../assets/jisoo.jpg" alt="" />
+  <div class="background">
+    <div class="main">
+      <div class="bp-image">
+        <img class="desktop" src="../assets/bp.jpg" alt="" />
+        <img class="mobile" src="../assets/mobile-bp.jpg" alt="" />
+      </div>
+      <div class="side-section">
+        <h2>BPSL MAINTAINCE SIGN UP</h2>
+        <div class="profiles">
+          <div class="profile" :key="index" v-for="(user, index) in allUsers">
+            <div class="image">
+              <img v-bind:src="user[1]" alt="" />
+            </div>
+            <div
+              v-bind:id="user[0]"
+              class="nametag"
+              v-on:click="overlayOn($event)"
+            >
+              {{ user[0] }}
+            </div>
           </div>
-          <div class="nametag" v-on:click="overlayOn">JISOO</div>
-        </div>
-        <div class="profile">
-          <div class="image">
-            <img src="../assets/jisoo.jpg" alt="" />
-          </div>
-          <div class="nametag" @click="getPosts()">JISOO</div>
-        </div>
-        <div class="profile">
-          <div class="image">
-            <img src="../assets/jisoo.jpg" alt="" />
-          </div>
-          <div class="nametag">JISOO</div>
-        </div>
-        <div class="profile">
-          <div class="image">
-            <img src="../assets/jisoo.jpg" alt="" />
-          </div>
-          <div class="nametag">JISOO</div>
         </div>
       </div>
-    </div>
-    <div v-on:click.self="overlayClose" id="overlay">
-      <input type="text" class="input" placeholder="Enter your password.." />
+      <div v-on:click.self="overlayClose" id="overlay">
+        <input
+          type="text"
+          class="input"
+          v-model="password"
+          placeholder="Enter your password.."
+        />
+        <div class="submit" @click="validatePassword()">let's get it</div>
+      </div>
     </div>
   </div>
 </template>
@@ -44,26 +40,60 @@ import axios from "axios";
 export default {
   name: "SignUp",
   data() {
-    return {};
+    return {
+      currentUser: "",
+      allUsers: [],
+      password: "",
+    };
   },
-  created() {},
+  created() {
+    this.getAdmins();
+  },
   destroyed() {},
   methods: {
-    overlayOn() {
+    overlayOn(e) {
       document.getElementById("overlay").style.height = "100%";
+      this.currentUser = e.currentTarget.id;
+      console.log(this.currentUser);
     },
-    overlayClose(e) {
+    overlayClose() {
       document.getElementById("overlay").style.height = "0";
-
-      console.log(e.target);
     },
-    getPosts() {
+    getAdmins() {
+      axios
+        .get("exec?action=getadmins")
+        .then((response) => {
+          this.allUsers = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    validatePassword() {
       axios
         .get(
-          "https://script.google.com/macros/s/AKfycbzCTAL17chofGcxUv_SLen6Lc0yOsLJesfK_D09AHGjt8O2Md5e8ZQT2yjs9PUnESNfQQ/exec"
+          "https://script.google.com/macros/s/AKfycbx_7Y4LN95exHiq7mgPgKhzzes5EhbyUVST7INH7DCC9JTKMyH3EwHikTYMjh31vQuP5w/exec?action=validatepassword&user=" +
+            this.currentUser +
+            "&pass=" +
+            this.password
         )
         .then((response) => {
-          console.log(response.data);
+          if (response.data == "success") {
+            this.$notify({
+              group: "foo",
+              title: "Blackpink in your area",
+              type: "success",
+              text: response.data,
+            });
+            this.$router.push("/dashboard");
+          } else {
+            this.$notify({
+              group: "foo",
+              title: "Sorry Not Sorry",
+              type: "error",
+              text: response.data,
+            });
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -78,19 +108,14 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../assets/scss/_shared.scss";
-
-body {
-  background: $primary-color;
+.background{
   display: flex;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-}
-#app {
-  display: flex;
-  justify-content: center;
+    justify-content: center;
+    align-items: center;
+    height: 100vh
+;
 }
 
 .main {
@@ -201,8 +226,29 @@ body {
   align-items: center;
   justify-content: center;
   input {
+    color: $secondary-color;
+    background: black;
     height: 40px;
     width: 200px;
+    border: none;
+    border-bottom: 1px solid $secondary-color;
+    &:focus {
+      outline: none;
+    }
+  }
+  .submit {
+    width: 100px;
+    border: 1px solid $secondary-color;
+    padding: 7px 0px;
+    cursor: pointer;
+    transition: all 0.5s ease-out;
+    color: $secondary-color;
+    margin-left: 5px;
+    &:hover {
+      color: white;
+      border: 1px solid white;
+      background: $secondary-color;
+    }
   }
 }
 
@@ -221,6 +267,7 @@ body {
         height: auto;
         display: block;
         object-fit: cover;
+        border-radius: 10px;
       }
     }
   }
